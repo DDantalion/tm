@@ -21,9 +21,9 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
         uint64_t start, end;
         int dummy = 0;
 
-        // 1. Warm up: 260 accesses
-        for (int i = 0; i < 260; ++i) {
-            dummy += remote_page[0];
+        // 1. Warm up: 4096 accesses
+        for (int i = 0; i < 4000; ++i) {
+            dummy += remote_page[i];
         }
         __syncthreads();
 
@@ -31,7 +31,7 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
         for (int i = 0; i < 100; ++i) {
             __syncthreads();
             start = clock64();
-            dummy += remote_page[0];
+            dummy += remote_page[4090];
             end = clock64();
             latencies[i] = end - start;
         }
@@ -41,8 +41,8 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
         for (int i = 0; i < 100; ++i) {
             __syncthreads();
             start = clock64();
-            dummy += left_neighbor_page[0];
-            dummy += right_neighbor_page[0];
+            dummy += left_neighbor_page[4090];
+            dummy += right_neighbor_page[4090];
             end = clock64();
             latencies[100 + i] = end - start;
         }
