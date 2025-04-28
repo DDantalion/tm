@@ -18,3 +18,6 @@ all: $(BINS)
 # Clean up generated binaries
 clean:
 	rm -f $(BINS)
+
+cache: cache.cu
+	nvcc -O3 -std=c++14 -o cache cache.cu
