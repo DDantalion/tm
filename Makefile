@@ -3,7 +3,7 @@ NVCC = nvcc
 CXXFLAGS = -O3 -std=c++14
 
 # Source files
-SOURCES = prefetch_latency_test.cu nvlink_contention_test.cu host_migration_parallelism_test.cu
+SOURCES = prefetched.cu contention.cu hostm.cu
 
 # Object files (just strip the .cu extension)
 BINS = $(SOURCES:.cu=)
