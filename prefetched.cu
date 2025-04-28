@@ -22,29 +22,28 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
         int dummy = 0;
 
         // 1. Warm up: 4096 accesses
-        for (int i = 0; i < 4000; ++i) {
+        for (int i = 0; i < 600; ++i) {
             dummy += remote_page[i];
         }
         __syncthreads();
 
         // 2. 100 accesses to remote page, record latency
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 1; ++i) {
             __syncthreads();
             start = clock64();
-            dummy += remote_page[4090];
+            dummy += remote_page[1000];
             end = clock64();
             latencies[i] = end - start;
         }
         __syncthreads();
 
         // 3. 100 accesses to neighbor pages, record latency
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 1; ++i) {
             __syncthreads();
             start = clock64();
-            dummy += left_neighbor_page[4090];
-            dummy += right_neighbor_page[4090];
+            dummy += right_neighbor_page[1];
             end = clock64();
-            latencies[100 + i] = end - start;
+            latencies[1 + i] = end - start;
         }
     }
 }
@@ -81,20 +80,20 @@ void run_remote_latency_test(int accessing_gpu, int owning_gpu) {
     CHECK_CUDA(cudaDeviceSynchronize());
 
     // Copy back results
-    uint64_t latencies[200];
+    uint64_t latencies[3];
     CHECK_CUDA(cudaMemcpy(latencies, d_latencies, sizeof(latencies), cudaMemcpyDeviceToHost));
 
     uint64_t sum_remote = 0, sum_neighbors = 0;
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 1; ++i) {
         sum_remote += latencies[i];
     }
-    for (int i = 100; i < 200; ++i) {
+    for (int i = 1; i < 2; ++i) {
         sum_neighbors += latencies[i];
     }
 
     std::cout << "GPU" << accessing_gpu << " accessing GPU" << owning_gpu << "'s memory:\n";
-    std::cout << "Average remote page latency: " << (double)sum_remote / 100 << " cycles\n";
-    std::cout << "Average neighbor pages latency: " << (double)sum_neighbors / 100 << " cycles\n";
+    std::cout << "Average remote page latency: " << (double)sum_remote / 1 << " cycles\n";
+    std::cout << "Average neighbor pages latency: " << (double)sum_neighbors / 1 << " cycles\n";
 
     // Cleanup
     CHECK_CUDA(cudaFree(d_latencies));
