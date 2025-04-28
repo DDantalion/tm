@@ -1,4 +1,4 @@
-// File: prefetch_latency_test.cu
+// File: prefetch_neighbor_latency_test.cu
 #include <cuda_runtime.h>
 #include <iostream>
 #include <chrono>
@@ -10,45 +10,63 @@
         exit(EXIT_FAILURE); \
     }
 
-const size_t PAGE_SIZE = 4096;  // 4 KB
-const size_t NUM_PAGES = 1024;  // total 4MB
+const size_t PAGE_SIZE = 4096;  // 4KB per page
+const int NUM_NEIGHBORS = 16;   // Number of neighboring pages to measure
 
-__global__ void touch_page(char *buf, int stride) {
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    if (idx < NUM_PAGES) {
-        volatile char val = buf[idx * stride];
+__global__ void access_one_page(char *buf, size_t page_idx) {
+    volatile char val = buf[page_idx * PAGE_SIZE];
+}
+
+__global__ void measure_neighbor_pages(char *buf, uint64_t *latencies, size_t base_idx, int num_neighbors) {
+    int tid = threadIdx.x;
+    if (tid < num_neighbors) {
+        uint64_t start = clock64();
+        volatile char val = buf[(base_idx + tid) * PAGE_SIZE];
+        uint64_t end = clock64();
+        latencies[tid] = end - start;
     }
 }
 
-void test_prefetch_latency(int src_gpu, int dst_gpu) {
-    CHECK_CUDA(cudaSetDevice(src_gpu));
+void test_remote_page_and_neighbors(int owner_gpu, int remote_gpu) {
+    CHECK_CUDA(cudaSetDevice(owner_gpu));
 
+    // Allocate large enough managed memory
     char *managed_buf = nullptr;
-    CHECK_CUDA(cudaMallocManaged(&managed_buf, NUM_PAGES * PAGE_SIZE));
+    size_t alloc_size = PAGE_SIZE * (NUM_NEIGHBORS + 64); // allocate more to be safe
+    CHECK_CUDA(cudaMallocManaged(&managed_buf, alloc_size));
 
-    // Touch the pages first on src_gpu to populate
-    touch_page<<<(NUM_PAGES + 255) / 256, 256>>>(managed_buf, PAGE_SIZE);
+    // Owner GPU initializes all pages
+    for (size_t i = 0; i < alloc_size; i += PAGE_SIZE) {
+        managed_buf[i] = 0;
+    }
     CHECK_CUDA(cudaDeviceSynchronize());
 
-    // Now switch to dst_gpu to test latency
-    CHECK_CUDA(cudaSetDevice(dst_gpu));
+    // Switch to remote GPU
+    CHECK_CUDA(cudaSetDevice(remote_gpu));
+
+    // 1. Access a single remote page (trigger migration)
+    access_one_page<<<1, 1>>>(managed_buf, 0);  // only page 0
     CHECK_CUDA(cudaDeviceSynchronize());
 
-    // Warm up
-    volatile char dummy = managed_buf[0];
+    // 2. Measure latency of neighbor pages
+    uint64_t *d_latencies, *h_latencies;
+    CHECK_CUDA(cudaMalloc(&d_latencies, sizeof(uint64_t) * NUM_NEIGHBORS));
+    h_latencies = new uint64_t[NUM_NEIGHBORS];
+
+    measure_neighbor_pages<<<1, NUM_NEIGHBORS>>>(managed_buf, d_latencies, 0, NUM_NEIGHBORS);
     CHECK_CUDA(cudaDeviceSynchronize());
 
-    // Measure access latency
-    auto start = std::chrono::high_resolution_clock::now();
-    touch_page<<<(NUM_PAGES + 255) / 256, 256>>>(managed_buf, PAGE_SIZE);
-    CHECK_CUDA(cudaDeviceSynchronize());
-    auto end = std::chrono::high_resolution_clock::now();
+    CHECK_CUDA(cudaMemcpy(h_latencies, d_latencies, sizeof(uint64_t) * NUM_NEIGHBORS, cudaMemcpyDeviceToHost));
 
-    double duration_us = std::chrono::duration<double, std::micro>(end - start).count();
-    std::cout << "Latency accessing neighbor pages from GPU " << dst_gpu
-              << ": " << duration_us / NUM_PAGES << " us per page" << std::endl;
+    std::cout << "Neighbor Page Latencies (cycles) after remote access:\n";
+    for (int i = 0; i < NUM_NEIGHBORS; ++i) {
+        std::cout << "Page " << i << ": " << h_latencies[i] << " cycles" << std::endl;
+    }
 
+    // Cleanup
     CHECK_CUDA(cudaFree(managed_buf));
+    CHECK_CUDA(cudaFree(d_latencies));
+    delete[] h_latencies;
 }
 
 int main() {
@@ -59,7 +77,8 @@ int main() {
         return -1;
     }
 
-    test_prefetch_latency(0, 1); // Access from GPU1 pages originally owned by GPU0
-    test_prefetch_latency(1, 0); // Access from GPU0 pages originally owned by GPU1
+    test_remote_page_and_neighbors(0, 1); // GPU 0 owns memory, GPU 1 accesses
+    test_remote_page_and_neighbors(1, 0); // GPU 1 owns memory, GPU 0 accesses
+
     return 0;
 }
