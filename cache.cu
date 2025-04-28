@@ -18,12 +18,10 @@ __global__ void measure_latency_kernel(uint64_t *latencies, int *array, int stri
     int index = tid * stride;
 
     for (int i = 0; i < iterations; ++i) {
-        __syncthreads();
         start = clock64();
         array[index] += 1;  // Access memory
         end = clock64();
         latencies[i] = (end - start);
-        __syncthreads();
     }
 }
 

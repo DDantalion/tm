@@ -8,9 +8,7 @@
     }
 
 __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, int page_size) {
-    int tid = threadIdx.x;
 
-    if (tid == 0) {
         int cacheline_size = 128 / sizeof(int);
         int elements_per_page = page_size / sizeof(int);
 
@@ -21,31 +19,26 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
         uint64_t start, end;
         int dummy = 0;
 
-        // 1. Warm up: 4096 accesses
+        // 1. 访问同一个page600次，NVIDIA使用的是access-counterbased migration method，threshold=256
         for (int i = 0; i < 600; ++i) {
             dummy += remote_page[i];
         }
-        __syncthreads();
 
-        // 2. 100 accesses to remote page, record latency
+        // 2. 一次access未被访问过的cacheline
         for (int i = 0; i < 1; ++i) {
-            __syncthreads();
             start = clock64();
             dummy += remote_page[1000];
             end = clock64();
             latencies[i] = end - start;
         }
-        __syncthreads();
 
-        // 3. 100 accesses to neighbor pages, record latency
+        // 3. 一次access访问相邻的page，查看是否在DRAM或CACHE
         for (int i = 0; i < 1; ++i) {
-            __syncthreads();
             start = clock64();
             dummy += right_neighbor_page[1];
             end = clock64();
             latencies[1 + i] = end - start;
         }
-    }
 }
 
 void run_remote_latency_test(int accessing_gpu, int owning_gpu) {
@@ -76,7 +69,7 @@ void run_remote_latency_test(int accessing_gpu, int owning_gpu) {
 
     // Launch on accessing_gpu
     CHECK_CUDA(cudaSetDevice(accessing_gpu));
-    remote_access_latency<<<1, 32>>>(d_latencies, d_remote_array, page_size);
+    remote_access_latency<<<1, 1>>>(d_latencies, d_remote_array, page_size);
     CHECK_CUDA(cudaDeviceSynchronize());
 
     // Copy back results
