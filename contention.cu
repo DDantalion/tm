@@ -30,7 +30,9 @@ void migrate_and_measure(int src_gpu, int dst_gpu, double &elapsed_ms) {
     // Time the migration by accessing pages
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < BUFFER_SIZE; i += 4096) {
+        for(size_t j =0; j < 300; j++){
         buf[i]++;
+        }
     }
     CHECK_CUDA(cudaDeviceSynchronize());
     auto end = std::chrono::high_resolution_clock::now();
