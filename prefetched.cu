@@ -22,19 +22,28 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
         // 1. 访问同一个page600次，NVIDIA使用的是access-counterbased migration method，threshold=256
         for (int i = 0; i < 600; ++i) {
             dummy += remote_page[i];
-        }
-        if(dummy>100000){
-            std::cout<<"aef";
+            if(dummy>100000){
+                latencies[i] -=5167;
+            }
         }
         // 2. 一次access未被访问过的cacheline
         for (int i = 0; i < 1; ++i) {
             start = clock64();
-            dummy += remote_page[1000];
+            dummy += remote_page[800];
             end = clock64();
             latencies[i] = end - start;
+            if(dummy>10000000){
+                latencies[i] -=568487;
+            }
         }
-        if(dummy>10000000){
-            std::cout<<"aessf";
+        for (int i = 0; i < 1; ++i) {
+            start = clock64();
+            dummy += remote_page[800];
+            end = clock64();
+            latencies[i+3] = end - start;
+            if(dummy>10000000){
+                latencies[i+3] -=568487;
+            }
         }
         // 3. 一次access访问相邻的page，查看是否在DRAM或CACHE
         for (int i = 0; i < 1; ++i) {
@@ -42,9 +51,18 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
             dummy += right_neighbor_page[1];
             end = clock64();
             latencies[1 + i] = end - start;
+            if(dummy>1000000000){
+                latencies[i] -=56898465;
+            }
         }
-        if(dummy>1000000000){
-            std::cout<<"aaef";
+        for (int i = 0; i < 1; ++i) {
+            start = clock64();
+            dummy += right_neighbor_page[1];
+            end = clock64();
+            latencies[2 + i] = end - start;
+            if(dummy>1000000000){
+                latencies[i] -=56898465;
+            }
         }
 }
 
@@ -93,8 +111,9 @@ void run_remote_latency_test(int accessing_gpu, int owning_gpu) {
 
     std::cout << "GPU" << accessing_gpu << " accessing GPU" << owning_gpu << "'s memory:\n";
     std::cout << "Average remote page latency: " << (double)sum_remote / 1 << " cycles\n";
+    std::cout << "Average cached remote page latency: " << (double)latencies[3]<< " cycles\n";
     std::cout << "Average neighbor pages latency: " << (double)sum_neighbors / 1 << " cycles\n";
-
+    std::cout << "Average cached neighbor pages latency: " << (double)latencies[2]<< " cycles\n";
     // Cleanup
     CHECK_CUDA(cudaFree(d_latencies));
     CHECK_CUDA(cudaSetDevice(owning_gpu));
