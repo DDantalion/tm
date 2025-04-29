@@ -3,7 +3,7 @@ NVCC = nvcc
 CXXFLAGS = -O3 -std=c++14
 
 # Source files
-SOURCES = prefetched.cu contention.cu hostm.cu
+SOURCES = prefetched.cu contention.cu hostm.cu contention4.cu
 
 # Object files (just strip the .cu extension)
 BINS = $(SOURCES:.cu=)
