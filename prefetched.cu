@@ -23,7 +23,9 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
         for (int i = 0; i < 600; ++i) {
             dummy += remote_page[i];
         }
-
+        if(dummy>100000){
+            std::cout<<"aef";
+        }
         // 2. 一次access未被访问过的cacheline
         for (int i = 0; i < 1; ++i) {
             start = clock64();
@@ -31,13 +33,18 @@ __global__ void remote_access_latency(uint64_t* latencies, int* remote_array, in
             end = clock64();
             latencies[i] = end - start;
         }
-
+        if(dummy>10000000){
+            std::cout<<"aessf";
+        }
         // 3. 一次access访问相邻的page，查看是否在DRAM或CACHE
         for (int i = 0; i < 1; ++i) {
             start = clock64();
             dummy += right_neighbor_page[1];
             end = clock64();
             latencies[1 + i] = end - start;
+        }
+        if(dummy>1000000000){
+            std::cout<<"aaef";
         }
 }
 

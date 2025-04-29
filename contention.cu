@@ -23,6 +23,9 @@ void migrate_and_measure(int src_gpu, int dst_gpu, double &elapsed_ms) {
     for (size_t i = 0; i < BUFFER_SIZE; i += 1) {
         buf[i] = 1;
     }
+    if(buf[0]>10000000){
+        std::cout<<"aessf";
+    }
     CHECK_CUDA(cudaDeviceSynchronize());
 
     CHECK_CUDA(cudaSetDevice(dst_gpu));
@@ -31,6 +34,9 @@ void migrate_and_measure(int src_gpu, int dst_gpu, double &elapsed_ms) {
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < BUFFER_SIZE; i += 1) {
         buf[i]++;
+    }
+    if(buf[0]>100000650){
+        std::cout<<"aessf";
     }
     CHECK_CUDA(cudaDeviceSynchronize());
     auto end = std::chrono::high_resolution_clock::now();
