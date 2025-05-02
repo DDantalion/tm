@@ -2,39 +2,33 @@
 #include <iostream>
 #include <x86intrin.h>
 
-#define BUFFER_SIZE (64 * 1024 * 1024)  // 64 MB
-#define ITERATIONS 100
+#define TRANSFER_SIZE 256  // bytes
+#define ITERATIONS 10000
 #define CHECK(call) \
     if ((call) != cudaSuccess) { \
         std::cerr << "CUDA error: " << cudaGetErrorString(call) << std::endl; \
         exit(EXIT_FAILURE); \
     }
 
-__global__ void migrate_kernel(char *buf, size_t size) {
-    for (size_t j = 0; j < 600; j++) {
-        for (size_t i = 0; i < size; i += size / sizeof(char)) {
-            buf[i] += 1;
-            if (buf[i] > 100) buf[i] -= 5;
-        }
-    }
-}
-
 int main() {
     int dev0 = 0, dev1 = 1;
     CHECK(cudaSetDevice(dev0));
 
-    char *buf;
-    CHECK(cudaMallocManaged(&buf, BUFFER_SIZE));  // Unified Memory
+    char *src, *dst;
+    CHECK(cudaMalloc(&src, TRANSFER_SIZE));
+    CHECK(cudaSetDevice(dev1));
+    CHECK(cudaMalloc(&dst, TRANSFER_SIZE));
+
+    CHECK(cudaSetDevice(dev0));
 
     for (int i = 0; i < ITERATIONS; ++i) {
         unsigned int aux;
         uint64_t start = __rdtscp(&aux);
-        migrate_kernel<<<1, 1>>>(buf, BUFFER_SIZE);
+        CHECK(cudaMemcpyPeer(dst, dev1, src, dev0, TRANSFER_SIZE));
         CHECK(cudaDeviceSynchronize());
         uint64_t end = __rdtscp(&aux);
         std::cout << "Cycle: " << (end - start) << std::endl;
     }
 
-    CHECK(cudaFree(buf));
     return 0;
 }
