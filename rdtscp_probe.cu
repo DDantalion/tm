@@ -3,7 +3,7 @@
 #include <x86intrin.h>
 
 #define TRANSFER_SIZE 256  // bytes
-#define ITERATIONS 1000000
+#define ITERATIONS 10000
 #define CHECK(call) \
     if ((call) != cudaSuccess) { \
         std::cerr << "CUDA error: " << cudaGetErrorString(call) << std::endl; \
