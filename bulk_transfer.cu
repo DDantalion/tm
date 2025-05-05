@@ -17,32 +17,32 @@ __global__ void migrate_kernel(char *buf, size_t size) {
     }
 }
 
+void migrate(size_t size){
+    int local_gpu = 1, remote_gpu = 0;
+    CHECK(cudaSetDevice(local_gpu));
+
+    char *buf;
+    CHECK(cudaMallocManaged(&buf, size));
+    //CHECK(cudaMemAdvise(buf, size, cudaMemAdviseSetPreferredLocation, remote_gpu));
+    //CHECK(cudaMemAdvise(buf, size, cudaMemAdviseSetAccessedBy, local_gpu));
+    CHECK(cudaSetDevice(remote_gpu)); 
+    CHECK(cudaDeviceSynchronize());
+    migrate_kernel<<<1, 1>>>(buf, size);
+    CHECK(cudaDeviceSynchronize());
+    CHECK(cudaFree(buf));
+}
 
 int main(int argc, char** argv) {
-    size_t size = 256 * 1024 * 1024;
+    size_t size = 64 * 1024 * 1024;
     int freq = 100;
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--freq") == 0 && i + 1 < argc) freq = atoi(argv[++i]);
         if (strcmp(argv[i], "--size") == 0 && i + 1 < argc) size = atol(argv[++i]);
     }
-
-    int local_gpu = 1, remote_gpu = 0;
-    CHECK(cudaSetDevice(local_gpu));
-
-    char *buf;
-    CHECK(cudaMallocManaged(&buf, size));
-    CHECK(cudaMemAdvise(buf, size, cudaMemAdviseSetPreferredLocation, remote_gpu));
-    CHECK(cudaMemAdvise(buf, size, cudaMemAdviseSetAccessedBy, local_gpu));
-    CHECK(cudaMemPrefetchAsync(buf, size, remote_gpu));
-    CHECK(cudaDeviceSynchronize());
-
     for (int i = 0; i < freq; ++i) {
-        migrate_kernel<<<1, 1>>>(buf, size);
-        CHECK(cudaDeviceSynchronize());
+        migrate(size);
     }
-
     std::cout << "Program B: Done " << freq << " transfers of size " << size << " bytes.\n";
-    CHECK(cudaFree(buf));
     return 0;
 }
