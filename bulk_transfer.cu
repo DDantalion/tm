@@ -1,10 +1,10 @@
 #include <cuda_runtime.h>
 #include <iostream>
+#include <cstring>
 
-#define BUFFER_SIZE (64 * 1024 * 1024)
 #define CHECK(call) \
     if ((call) != cudaSuccess) { \
-        std::cerr << "CUDA Error: " << cudaGetErrorString(call) << std::endl; \
+        std::cerr << "CUDA error: " << cudaGetErrorString(call) << std::endl; \
         exit(EXIT_FAILURE); \
     }
 
@@ -17,25 +17,32 @@ __global__ void migrate_kernel(char *buf, size_t size) {
     }
 }
 
-int main() {
-    int local_gpu = 1;
-    int remote_gpu = 0;
+
+int main(int argc, char** argv) {
+    size_t size = 256 * 1024 * 1024;
+    int freq = 100;
+
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--freq") == 0 && i + 1 < argc) freq = atoi(argv[++i]);
+        if (strcmp(argv[i], "--size") == 0 && i + 1 < argc) size = atol(argv[++i]);
+    }
+
+    int local_gpu = 1, remote_gpu = 0;
     CHECK(cudaSetDevice(local_gpu));
 
-    char *buf = nullptr;
-    CHECK(cudaMallocManaged(&buf, BUFFER_SIZE));
-
-    CHECK(cudaMemAdvise(buf, BUFFER_SIZE, cudaMemAdviseSetPreferredLocation, remote_gpu));
-    CHECK(cudaMemAdvise(buf, BUFFER_SIZE, cudaMemAdviseSetAccessedBy, local_gpu));
-    CHECK(cudaMemPrefetchAsync(buf, BUFFER_SIZE, remote_gpu));
+    char *buf;
+    CHECK(cudaMallocManaged(&buf, size));
+    CHECK(cudaMemAdvise(buf, size, cudaMemAdviseSetPreferredLocation, remote_gpu));
+    CHECK(cudaMemAdvise(buf, size, cudaMemAdviseSetAccessedBy, local_gpu));
+    CHECK(cudaMemPrefetchAsync(buf, size, remote_gpu));
     CHECK(cudaDeviceSynchronize());
 
-    for (int i = 0; i < 100; ++i) {
-        migrate_kernel<<<1, 1>>>(buf, BUFFER_SIZE);
+    for (int i = 0; i < freq; ++i) {
+        migrate_kernel<<<1, 1>>>(buf, size);
         CHECK(cudaDeviceSynchronize());
     }
 
-    std::cout << "Program B completed remote page migrations.\n";
+    std::cout << "Program B: Done " << freq << " transfers of size " << size << " bytes.\n";
     CHECK(cudaFree(buf));
     return 0;
 }

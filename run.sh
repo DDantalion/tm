@@ -3,16 +3,25 @@
 # Compile both programs
 nvcc -o prog_a rdtscp_probe.cu -lpthread
 nvcc -o prog_b bulk_transfer.cu
+#!/bin/bash
 
-# Run both programs concurrently
-./prog_a > prog_a.log &
-PID_A=$!
+FREQS=(10 100 1000)
+SIZES=(67108864 134217728 268435456)  # 64MB, 128MB, 256MB
 
-./prog_b > prog_b.log &
-PID_B=$!
+for freq in "${FREQS[@]}"; do
+    for size in "${SIZES[@]}"; do
+        echo "Testing freq=$freq size=$size"
+        
+        ./program_a --freq $freq --size $size > a_f${freq}_s${size}.log &
+        pid_a=$!
+        
+        ./program_b --freq $freq --size $size > b_f${freq}_s${size}.log &
+        pid_b=$!
+        
+        wait $pid_a
+        wait $pid_b
+        echo "Completed freq=$freq size=$size"
+    done
+done
 
-# Wait for both to finish
-wait $PID_A
-wait $PID_B
-
-echo "Experiment completed. Results are in prog_a.log and prog_b.log"
+echo "All experiments done."
