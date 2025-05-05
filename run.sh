@@ -12,14 +12,23 @@ for freq in "${FREQS[@]}"; do
     for size in "${SIZES[@]}"; do
         echo "Testing freq=$freq size=$size"
         
-        ./program_a --freq $freq --size $size > a_f${freq}_s${size}.log &
+        ./prog_a --freq $freq --size $size > a_f${freq}_s${size}.log &
         pid_a=$!
         
-        ./program_b --freq $freq --size $size > b_f${freq}_s${size}.log &
+        ./prog_b --freq $freq --size $size > b_f${freq}_s${size}.log &
         pid_b=$!
         
         wait $pid_a
         wait $pid_b
+        echo "Completed freq=$freq size=$size"
+    done
+done
+
+for freq in "${FREQS[@]}"; do
+    for size in "${SIZES[@]}"; do
+        echo "Testing freq=$freq size=$size"
+        
+        ./prog_a --freq $freq --size $size > baseline_a_f${freq}_s${size}.log
         echo "Completed freq=$freq size=$size"
     done
 done
