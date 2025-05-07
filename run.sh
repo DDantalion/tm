@@ -5,8 +5,8 @@ nvcc -o prog_a rdtscp_probe.cu -lpthread
 nvcc -o prog_b bulk_transfer.cu
 #!/bin/bash
 
-FREQS=(10 50 100)
-SIZES=(16777216 33554432 67108864)  # 16MB, 32MB, 64MB
+FREQS=(50 100 200)
+SIZES=(65536 131072 262144 524288 1048576)  #  64KB 128KB 256KB 512KB 1MB
 
 for freq in "${FREQS[@]}"; do
     for size in "${SIZES[@]}"; do
