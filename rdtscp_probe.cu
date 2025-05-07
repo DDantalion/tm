@@ -18,8 +18,8 @@ __global__ void migrate_kernel(char *buf, size_t size) {
     }
 }
 
-void migrate(size_t size){
-    int local_gpu = 1, remote_gpu = 0;
+void migrate(size_t size, size_t local, size_t remote){
+    int local_gpu = local, remote_gpu = remote;
     CHECK(cudaSetDevice(local_gpu));
 
     char *buf;
@@ -36,16 +36,19 @@ void migrate(size_t size){
 int main(int argc, char** argv) {
     size_t size = 64 * 1024 * 1024;
     int freq = 100;
+    int local_gpu, remote_gpu;
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--freq") == 0 && i + 1 < argc) freq = atoi(argv[++i]);
         if (strcmp(argv[i], "--size") == 0 && i + 1 < argc) size = atol(argv[++i]);
+        if (strcmp(argv[i], "--local") == 0 && i + 1 < argc) local_gpu = atoi(argv[++i]);
+        if (strcmp(argv[i], "--remote") == 0 && i + 1 < argc) remote_gpu = atol(argv[++i]);
     }
 
     for (int i = 0; i < freq; ++i) {
         unsigned aux;
         uint64_t start = __rdtscp(&aux);
-        migrate(size);
+        migrate(size, local_gpu, remote_gpu);
         CHECK(cudaDeviceSynchronize());
         uint64_t end = __rdtscp(&aux);
         std::cout << "Cycle: " << (end - start) << std::endl;
