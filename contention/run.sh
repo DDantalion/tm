@@ -15,15 +15,11 @@ for freq in "${FREQS[@]}"; do
         ./prog_a --freq $freq --size $size > a_f${freq}_s${size}.log &
         pid_a=$!
         
-        ./prog_b --freq $freq --size $size --local 1 > b_f${freq}_s${size}.log &
-        pid_b1=$! 
-
-        ./prog_b --freq $freq --size $size --local 2 > b_f${freq}_s${size}.log &
-        pid_b2=$! 
+        ./prog_b --freq $freq --size $size > b_f${freq}_s${size}.log &
+        pid_b=$! 
         
-        wait $pid_a 
-        wait $pid_b1 
-        wait $pid_b2
+        wait $pid_a
+        wait $pid_b
         echo "Completed freq=$freq size=$size"
     done
 done

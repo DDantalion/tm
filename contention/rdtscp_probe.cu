@@ -1,5 +1,6 @@
 #include <cuda_runtime.h>
 #include <iostream>
+#include <x86intrin.h>
 #include <cstring>
 
 #define CHECK(call) \
@@ -17,8 +18,8 @@ __global__ void migrate_kernel(char *buf, size_t size) {
     }
 }
 
-void migrate(size_t size, size_t local){
-    int local_gpu = local, remote_gpu = 0;
+void migrate(size_t size){
+    int local_gpu = 1, remote_gpu = 0;
     CHECK(cudaSetDevice(local_gpu));
 
     char *buf;
@@ -35,16 +36,19 @@ void migrate(size_t size, size_t local){
 int main(int argc, char** argv) {
     size_t size = 64 * 1024 * 1024;
     int freq = 100;
-    int local_gpu = 1;
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--freq") == 0 && i + 1 < argc) freq = atoi(argv[++i]);
         if (strcmp(argv[i], "--size") == 0 && i + 1 < argc) size = atol(argv[++i]);
-        if (strcmp(argv[i], "--local") == 0 && i + 1 < argc) local_gpu = atol(argv[++i]);
     }
+
     for (int i = 0; i < freq; ++i) {
-        migrate(size, local_gpu);
+        unsigned aux;
+        uint64_t start = __rdtscp(&aux);
+        migrate(size);
+        CHECK(cudaDeviceSynchronize());
+        uint64_t end = __rdtscp(&aux);
+        std::cout << "Cycle: " << (end - start) << std::endl;
     }
-    std::cout << "Program B: Done " << freq << " transfers of size " << size << " bytes.\n";
     return 0;
 }
