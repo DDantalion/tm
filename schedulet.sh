@@ -12,6 +12,38 @@ for freq in "${FREQS[@]}"; do
     for size in "${SIZES[@]}"; do
         echo "Testing freq=$freq size=$size"
         
+        ./prog_a --freq $freq --size $size --local 0 --remote 1  > 2gpugpu1a0${freq}_s${size}.log &
+        pid_a=$!
+        
+        ./prog_a --freq $freq --size $size --local 1 --remote 0 > 2gpugpu0a1${freq}_s${size}.log &
+        pid_a1=$! 
+        
+        wait $pid_a 
+        wait $pid_a1 
+        echo "Completed freq=$freq size=$size"
+    done
+done
+
+for freq in "${FREQS[@]}"; do
+    for size in "${SIZES[@]}"; do
+        echo "Testing freq=$freq size=$size"
+        
+        ./prog_a --freq $freq --size $size --local 0 --remote 1  > 3gpugpu1a0${freq}_s${size}.log &
+        pid_a=$!
+        
+        ./prog_a --freq $freq --size $size --local 0 --remote 2 > 3gpugpu0a1${freq}_s${size}.log &
+        pid_a1=$! 
+        
+        wait $pid_a 
+        wait $pid_a1 
+        echo "Completed freq=$freq size=$size"
+    done
+done
+
+for freq in "${FREQS[@]}"; do
+    for size in "${SIZES[@]}"; do
+        echo "Testing freq=$freq size=$size"
+        
         ./prog_a --freq $freq --size $size --local 0 --remote 1  > gpu1a0${freq}_s${size}.log &
         pid_a=$!
         
@@ -43,5 +75,16 @@ for freq in "${FREQS[@]}"; do
         echo "Completed freq=$freq size=$size"
     done
 done
+
+        ./prog_a --freq $freq --size $size --local 0 --remote 1 --count 1 > rdma_gpu1a0${freq}_s${size}.log
+        ./prog_a --freq $freq --size $size --local 0 --remote 2 --count 1 > rdma_gpu2a0${freq}_s${size}.log
+        ./prog_a --freq $freq --size $size --local 0 --remote 3 --count 1 > rdma_gpu3a0${freq}_s${size}.log
+        ./prog_a --freq $freq --size $size --local 0 --remote 3 --count 1 > rdma_gpu4a0${freq}_s${size}.log
+        ./prog_a --freq $freq --size $size --local 0 --remote 4 --count 1 > rdma_gpu5a0${freq}_s${size}.log
+        ./prog_a --freq $freq --size $size --local 0 --remote 5 --count 1 > rdma_gpu6a0${freq}_s${size}.log
+        ./prog_a --freq $freq --size $size --local 0 --remote 6 --count 1 > rdma_gpu7a0${freq}_s${size}.log
+        ./prog_a --freq $freq --size $size --local 0 --remote 7 --count 1 > rdma_gpu8a0${freq}_s${size}.log
+
+
 
 echo "All experiments done."
