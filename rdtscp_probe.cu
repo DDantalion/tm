@@ -35,7 +35,7 @@ void migrate(size_t size, size_t local, size_t remote, size_t count){
 
 int main(int argc, char** argv) {
     size_t size = 64 * 1024 * 1024;
-    size_t count = 300
+    size_t count = 300;
     int freq = 100;
     int local_gpu, remote_gpu;
 
