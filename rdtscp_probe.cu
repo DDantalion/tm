@@ -22,7 +22,7 @@ __global__ void migrate_kernel(char *buf, size_t size,
     uint64_t start = clock64();
 
     for (size_t j = 0; j < count; ++j) {
-        for (size_t i = 0; i < size; i += size / sizeof(char)) {
+        for (size_t i = 0; i < size; i += 4096) {
             buf[i] += 1;
             if (buf[i] > 100) buf[i] -= 5;
         }
