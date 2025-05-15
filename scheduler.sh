@@ -233,6 +233,6 @@ mkdir 8gpuplots
 python3 plot.py ./8gpu  ./8gpuplots
 
 
-
-tar -czvf ./ v100r.tar.gz
+cd ..
+tar -czvf v100r.tar.gz ./tm
 echo "All experiments done."

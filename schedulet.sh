@@ -308,5 +308,6 @@ mkdir baselinerdmaplots
 python3 plot.py ./baselinerdma  ./baselinerdmaplots
 
 
-tar -czvf ./ v100.tar.gz
+cd ..
+tar -czvf v100.tar.gz ./tm
 echo "All experiments done."
