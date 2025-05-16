@@ -5,7 +5,7 @@ nvcc -o prog_a rdtscp_probe.cu -lpthread
 nvcc -o prog_b bulkn.cu
 
 
-SIZES=(65536)  #  64KB
+$size = 65536  #  64KB
 
 mkdir 2logs
 # Run both programs concurrently
