@@ -13,7 +13,7 @@ for size in "${SIZES[@]}"; do
 ./prog_a > ./logs/s${size}.log &
 PID_A=$!
 
-./prog_b > /dev/null 2>&1 &
+./prog_b --size $size > /dev/null 2>&1 &
 PID_B=$!
 
 # Wait for both to finish
@@ -21,9 +21,9 @@ wait $PID_A
 wait $PID_B
 echo "Completed size=$size"
 done
+./prog_a > ./logs/baseline.log
 
-
-echo "Experiment completed. Results are in prog_a.log and prog_b.log"
+echo "Experiment completed."
 
 mkdir plots
 python3 plot.py ./logs  ./plots
