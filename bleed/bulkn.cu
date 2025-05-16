@@ -8,7 +8,7 @@
         exit(EXIT_FAILURE); \
     }
 
-int main() {
+int main(int argc, char **argv) {
     int dev0 = 1, dev1 = 0;
     size_t TRANSFER_SIZE = 256;
     size_t count = 100;
