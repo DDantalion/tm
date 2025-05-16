@@ -16,6 +16,8 @@ int main(int argc, char **argv) {
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--size") == 0 && i + 1 < argc) TRANSFER_SIZE = atol(argv[++i]);
         if (strcmp(argv[i], "--count") == 0 && i + 1 < argc) count = atol(argv[++i]);
+        if (!strcmp(argv[i], "--local" ) && i + 1 < argc) dev0 = atoi(argv[++i]);
+        if (!strcmp(argv[i], "--remote") && i + 1 < argc) dev1 = atoi(argv[++i]);
     }
     CHECK(cudaSetDevice(dev0));
 
