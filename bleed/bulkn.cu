@@ -11,7 +11,7 @@
 int main(int argc, char **argv) {
     int dev0 = 1, dev1 = 0;
     size_t TRANSFER_SIZE = 256;
-    size_t count = 1000;
+    size_t count = 200;
 
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--size") == 0 && i + 1 < argc) TRANSFER_SIZE = atol(argv[++i]);
@@ -28,10 +28,13 @@ int main(int argc, char **argv) {
 
     CHECK(cudaSetDevice(dev0));
     for (int i = 0; i < count; ++i) {
+        unsigned int aux;
+        uint64_t start = __rdtscp(&aux);
         CHECK(cudaMemcpyPeer(dst, dev1, src, dev0, TRANSFER_SIZE));
         CHECK(cudaDeviceSynchronize());
+        uint64_t end = __rdtscp(&aux);
+        std::cout << "Cycle: " << (end - start) << std::endl;
     }
 
-    std::cout << "Program B: Completed 100 transfers of 16MB." << std::endl;
     return 0;
 }

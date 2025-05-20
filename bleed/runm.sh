@@ -37,12 +37,13 @@ PID_B=$!
 PID_B1=$!
 
 ./prog_b --size $size --local 0 --remote 2 > /dev/null 2>&1 &
-PID_B1=$!
+PID_B2=$!
 
 # Wait for both to finish
 wait $PID_A
 wait $PID_B
 wait $PID_B1
+wait $PID_B2
 echo "Completed size=$size"
 done
 mkdir 3plots
@@ -61,16 +62,17 @@ PID_B=$!
 PID_B1=$!
 
 ./prog_b --size $size --local 3 --remote 2 > /dev/null 2>&1 &
-PID_B1=$!
+PID_B2=$!
 
 ./prog_b --size $size --local 0 --remote 3 > /dev/null 2>&1 &
-PID_B2=$!
+PID_B3=$!
 
 # Wait for both to finish
 wait $PID_A
 wait $PID_B
 wait $PID_B1
 wait $PID_B2
+wait $PID_B3
 echo "Completed size=$size"
 done
 mkdir 4plots
