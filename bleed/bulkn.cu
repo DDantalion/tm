@@ -1,6 +1,6 @@
 #include <cuda_runtime.h>
 #include <iostream>
-
+#include <x86intrin.h>
 
 #define CHECK(call) \
     if ((call) != cudaSuccess) { \
