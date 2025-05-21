@@ -309,5 +309,5 @@ python3 plot.py ./baselinerdma  ./baselinerdmaplots
 
 
 cd ..
-tar -czvf v100.tar.gz ./tm
+tar -czvf schedulet.tar.gz ./tm
 echo "All experiments done."
