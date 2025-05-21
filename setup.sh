@@ -23,25 +23,25 @@ chmod +x schedulec.sh
 cd ..
 cd ..
 cd ..
-mkdir tmcr
-cd tmcr
+mkdir tmo
+cd tmo
 git clone https://github.com/DDantalion/tm.git
 cd tm
 cd round
-chmod +x schedulecr.sh
-./schedulecr.sh
+chmod +x scheduleo.sh
+./scheduleo.sh
 cd ..
 cd ..
 cd ..
-mkdir tmt
-cd tmt
+mkdir tml
+cd tml
 git clone https://github.com/DDantalion/tm.git
 cd tm
 cd round
-chmod +x schedulet.sh
-./schedulet.sh
+chmod +x schedulel.sh
+./schedulel.sh
 #scp -P 42144 -r root@connect.bjc1.seetacloud.com:/root/tm ./Desktop/ncontention/bleed/A100/
-#scp -r ubuntu@129.146.46.231:/home/ubuntu/tmr/tm/bleed.tar.gz ./Desktop/ncontention/bleed/A100/runr.tar.gz
-#scp -r ubuntu@129.146.46.231:/home/ubuntu/tmc/tm/schedulec.tar.gz ./Desktop/ncontention/bleed/A100/
-#scp -r ubuntu@129.146.46.231:/home/ubuntu/tmcr/tm/schedulecr.tar.gz ./Desktop/ncontention/bleed/A100/
-#scp -r ubuntu@129.146.46.231:/home/ubuntu/tmt/tm/schedulet.tar.gz ./Desktop/ncontention/bleed/A100/
+#scp -r ubuntu@64.181.223.194:/home/ubuntu/tmr/tm/bleed.tar.gz ./Desktop/ncontention/bleed/A100II/runr.tar.gz
+scp -r ubuntu@64.181.223.194:/home/ubuntu/tmo/tm/scheduleo.tar.gz ./Desktop/ncontention/bleed/A100III/
+scp -r ubuntu@64.181.223.194:/home/ubuntu/tml/tm/schedulel.tar.gz ./Desktop/ncontention/bleed/A100III/
+#scp -r ubuntu@64.181.223.194:/home/ubuntu/tmt/tm/schedulet.tar.gz ./Desktop/ncontention/bleed/A100II/

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Compile both programs
-nvcc -o prog_a rdtscp_probem.cu -lpthread
+nvcc -o prog_a rdtscp_probeo.cu -lpthread
 nvcc -o prog_b bulk_transfer.cu
 #!/bin/bash
 
@@ -309,5 +309,5 @@ python3 plot.py ./baselinerdma  ./baselinerdmaplots
 
 
 cd ..
-tar -czvf schedulel.tar.gz ./round
+tar -czvf scheduleo.tar.gz ./round
 echo "All experiments done."
