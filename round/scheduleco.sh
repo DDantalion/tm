@@ -254,5 +254,5 @@ python3 plot.py ./baseline  ./baselinegpuplots
 
 
 cd ..
-tar -czvf schedulec.tar.gz ./tm
+tar -czvf schedulec.tar.gz ./round
 echo "All experiments done."

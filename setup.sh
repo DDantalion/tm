@@ -42,6 +42,6 @@ chmod +x schedulecl.sh
 ./schedulecl.sh
 #scp -P 42144 -r root@connect.bjc1.seetacloud.com:/root/tm ./Desktop/ncontention/bleed/A100/
 #scp -r ubuntu@64.181.223.194:/home/ubuntu/tmr/tm/bleed.tar.gz ./Desktop/ncontention/bleed/A100II/runr.tar.gz
-scp -r ubuntu@64.181.209.205:/home/ubuntu/tmo/tm/scheduleo.tar.gz ./Desktop/ncontention/bleed/A100IV/scheduleco.tar.gz
-scp -r ubuntu@64.181.209.205:/home/ubuntu/tml/tm/schedulel.tar.gz ./Desktop/ncontention/bleed/A100IV/schedulecl.tar.gz
+scp -r ubuntu@64.181.214.142:/home/ubuntu/tmo/tm/scheduleo.tar.gz ./Desktop/ncontention/bleed/A100IV/scheduleco.tar.gz
+scp -r ubuntu@64.181.214.142:/home/ubuntu/tml/tm/schedulel.tar.gz ./Desktop/ncontention/bleed/A100IV/schedulecl.tar.gz
 #scp -r ubuntu@64.181.223.194:/home/ubuntu/tmt/tm/schedulet.tar.gz ./Desktop/ncontention/bleed/A100II/
