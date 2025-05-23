@@ -4,7 +4,7 @@
 nvcc -o prog_a multiplek.cu -lpthread
 #!/bin/bash
 
-FREQS=(200)
+FREQS=(100)
 NUMBERS=(2 3 4 5 6 7 8)
 SIZES=(65536 131072 262144 524288 1048576)  #  64KB 128KB 256KB 512KB 1MB
 

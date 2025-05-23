@@ -22,7 +22,7 @@ __global__ void migrate_kernel(char *buf, size_t size,
     uint64_t start = clock64();
 
     for (size_t j = 0; j < 1; ++j) {
-        for (size_t i = ini; i < (ini+size); i += 4096/sizeof(char)) {
+        for (size_t i = ini; i < (ini+size); i += 1048576/sizeof(char)) {
             buf[i] += 1;
             if (buf[i] > 100) buf[i] -= 5;
         }
@@ -58,7 +58,7 @@ static void migrate(char* buf, uint64_t* cycles, size_t size, size_t number, siz
     migrate_kernel<<<1, 1>>>(buf, size, &cycles[i-1], (size*(order*(number-1) - 1 + i))/sizeof(char));
     }
     CHECK(cudaDeviceSynchronize());
-    for(int i =0; i< number; i++){
+    for(int i =0; i< number-1; i++){
     std::cout << "GPU" << i+1 << "Cycle: " << cycles[i] << '\t';
     float gbps = compute_bandwidth(size, cycles[i]);
     std::cout << "Estimated bandwidth: " << gbps << " GB/s" << std::endl;
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         //if (!strcmp(argv[i], "--count" ) && i + 1 < argc) count     = atol(argv[++i]);
         if (!strcmp(argv[i], "--number" ) && i + 1 < argc) number     = atol(argv[++i]);
     }
-    size_t SIZE     = number * size * freq;  // 64 MiB
+    size_t SIZE     = (number) * 1048576 * freq;  //  100 - 700 MiB
     // Select the GPU that owns the allocation (local)
     CHECK(cudaSetDevice(local_gpu));
     char     *buf;
