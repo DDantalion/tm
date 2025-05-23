@@ -14,7 +14,7 @@ for freq in "${FREQS[@]}"; do
         for number in "${NUMBERS[@]}"; do
             echo "Testing freq=$freq size=$size number=$number"
 
-            ./prog_a --freq $freq --size $size --local 1 --number $number > ./final_m/${freq}_s${size}_n${number}.log
+            ./prog_a --freq $freq --size $size --number $number > ./final_m/${freq}_s${size}_n${number}.log
 
             echo "Completed freq=$freq size=$size number=$number"
         done
