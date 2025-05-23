@@ -55,7 +55,7 @@ static void migrate(char* buf, uint64_t* cycles, size_t size, size_t number, siz
     // Switch to the GPU that will execute the kernel (remote)
     for(int i =1; i< number; i++){
     CHECK(cudaSetDevice(i));
-    migrate_kernel<<<1, 1>>>(buf, size, *cycles[i-1], (size*(order*(number-1) - 1 + i))/sizeof(char));
+    migrate_kernel<<<1, 1>>>(buf, size, &cycles[i-1], (size*(order*(number-1) - 1 + i))/sizeof(char));
     }
     CHECK(cudaDeviceSynchronize());
     for(int i =0; i< number; i++){
