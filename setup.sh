@@ -48,8 +48,15 @@ cd tm
 cd round
 chmod +x test_migration.sh
 ./test_migration.sh
+
+git clone https://github.com/DDantalion/tm.git
+cd tm
+cd final
+chmod +x final_multi.sh
+./final_multi.sh
+
 #scp -P 42144 -r root@connect.bjc1.seetacloud.com:/root/tm ./Desktop/ncontention/bleed/A100/
 #scp -r ubuntu@64.181.223.194:/home/ubuntu/tmr/tm/bleed.tar.gz ./Desktop/ncontention/bleed/A100II/runr.tar.gz
-scp -r ubuntu@104.171.202.153:/home/ubuntu/tms/tm/migration.tar.gz ./Desktop/finalc/V100/
+scp -r ubuntu@104.171.203.180:/home/ubuntu/tm/finalmulti.tar.gz ./Desktop/finalc/V100/
 #scp -r ubuntu@64.181.214.142:/home/ubuntu/tml/tm/schedulec.tar.gz ./Desktop/ncontention/bleed/A100IV/schedulecl.tar.gz
 #scp -r ubuntu@64.181.223.194:/home/ubuntu/tmt/tm/schedulet.tar.gz ./Desktop/ncontention/bleed/A100II/
