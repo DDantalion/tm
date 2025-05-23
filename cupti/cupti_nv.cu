@@ -67,30 +67,36 @@ int main() {
     CHECK_CUPTI(cuptiDeviceEnumEventDomains(device, &sizeDomains, domains.data()));
 
     // Search for "nvlink_total_data_received"
-    bool found = false;
-    for (auto domain : domains) {
-        uint32_t numEvents = 0;
-        CHECK_CUPTI(cuptiEventDomainGetNumEvents(domain, &numEvents));
+bool found = false;
+for (auto domain : domains) {
+    uint32_t numEvents = 0;
+    size_t attrSize = sizeof(numEvents);
+    CUptiResult attrStatus = cuptiEventDomainGetAttribute(
+        domain,
+        CUPTI_EVENT_DOMAIN_ATTR_TOTAL_EVENTS,
+        &attrSize,
+        &numEvents);
 
-        std::vector<CUpti_EventID> events(numEvents);
-        size_t sizeEvents = numEvents;
-        CHECK_CUPTI(cuptiEventDomainEnumEvents(domain, &sizeEvents, events.data()));
+    if (attrStatus != CUPTI_SUCCESS || numEvents == 0) continue;
 
-        for (auto ev : events) {
-            char name[128];
-            size_t len = sizeof(name);
-            CHECK_CUPTI(cuptiEventGetAttribute(ev, CUPTI_EVENT_ATTR_NAME, &len, name));
+    std::vector<CUpti_EventID> events(numEvents);
+    size_t sizeEvents = numEvents;
+    CHECK_CUPTI(cuptiEventDomainEnumEvents(domain, &sizeEvents, events.data()));
 
-            if (std::string(name) == "nvlink_total_data_received") {
-                eventId = ev;
-                found = true;
-                break;
-            }
+    for (auto ev : events) {
+        char name[128];
+        size_t len = sizeof(name);
+        CHECK_CUPTI(cuptiEventGetAttribute(ev, CUPTI_EVENT_ATTR_NAME, &len, name));
+
+        if (std::string(name) == "nvlink_total_data_received") {
+            eventId = ev;
+            found = true;
+            break;
         }
-
-        if (found) break;
     }
 
+    if (found) break;
+}
     if (!found) {
         std::cerr << "CUPTI event 'nvlink_total_data_received' not found.\n";
         return -1;
