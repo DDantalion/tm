@@ -56,12 +56,13 @@ int main() {
     CUpti_EventID eventId;
     uint64_t eventVal = 0;
 
-    uint32_t numDomains32;
-    CHECK_CUPTI(cuptiDeviceGetNumEventDomains(device, &numDomains32));
+uint32_t numDomains32;
+CHECK_CUPTI(cuptiDeviceGetNumEventDomains(device, &numDomains32));
 
-    size_t numDomains = static_cast<size_t>(numDomains32);
-    std::vector<CUpti_EventDomainID> domains(numDomains);
-    CHECK_CUPTI(cuptiDeviceEnumEventDomains(device, &numDomains, domains.data()));
+std::vector<CUpti_EventDomainID> domains(numDomains32);
+size_t sizeInBytes = numDomains32 * sizeof(CUpti_EventDomainID);
+CHECK_CUPTI(cuptiDeviceEnumEventDomains(device, &sizeInBytes, domains.data()));
+size_t numDomains = sizeInBytes / sizeof(CUpti_EventDomainID);
 
     bool found = false;
     for (auto domain : domains) {
