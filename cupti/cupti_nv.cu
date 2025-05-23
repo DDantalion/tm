@@ -17,6 +17,15 @@
         }                                                                      \
     } while (0)
 
+#define CHECK_CUDA_RT(call)                                                    \
+    do {                                                                       \
+        cudaError_t _status = call;                                            \
+        if (_status != cudaSuccess) {                                          \
+            std::cerr << "CUDA Runtime API error: " << cudaGetErrorString(_status) << " at line " << __LINE__ << "\n"; \
+            exit(EXIT_FAILURE);                                                \
+        }                                                                      \
+    } while (0)
+
 #define CHECK_CUPTI(call)                                                      \
     do {                                                                       \
         CUptiResult _status = call;                                            \
@@ -28,7 +37,6 @@
         }                                                                      \
     } while (0)
 
-// Dummy kernel
 __global__ void dummy_kernel(char *buf, size_t size) {
     for (size_t i = 0; i < size; i += 256)
         buf[i]++;
@@ -47,7 +55,7 @@ int main() {
     CUpti_EventID eventId;
     uint64_t eventVal = 0;
 
-    size_t numDomains;
+    uint32_t numDomains;
     CHECK_CUPTI(cuptiDeviceGetNumEventDomains(device, &numDomains));
 
     std::vector<CUpti_EventDomainID> domains(numDomains);
@@ -55,7 +63,7 @@ int main() {
 
     bool found = false;
     for (auto domain : domains) {
-        size_t numEvents;
+        uint32_t numEvents;
         CHECK_CUPTI(cuptiEventDomainGetNumEvents(domain, &numEvents));
         std::vector<CUpti_EventID> events(numEvents);
         CHECK_CUPTI(cuptiEventDomainEnumEvents(domain, &numEvents, events.data()));
@@ -82,7 +90,6 @@ int main() {
     CHECK_CUPTI(cuptiEventGroupAddEvent(eventGroup, eventId));
     CHECK_CUPTI(cuptiEventGroupEnable(eventGroup));
 
-    // Read initial counter
     size_t valueSize = sizeof(uint64_t);
     CHECK_CUPTI(cuptiEventGroupReadEvent(eventGroup, CUPTI_EVENT_READ_FLAG_NONE,
                                          eventId, &valueSize, &eventVal));
@@ -93,14 +100,13 @@ int main() {
     // Run dummy workload
     char *buf;
     size_t size = 64 * 1024 * 1024; // 64 MB
-    CHECK_CUDA(cudaMalloc(&buf, size));
+    CHECK_CUDA_RT(cudaMalloc(&buf, size));
     dummy_kernel<<<128, 256>>>(buf, size);
-    CHECK_CUDA(cudaDeviceSynchronize());
-    CHECK_CUDA(cudaFree(buf));
+    CHECK_CUDA_RT(cudaDeviceSynchronize());
+    CHECK_CUDA_RT(cudaFree(buf));
 
     auto endTime = std::chrono::high_resolution_clock::now();
 
-    // Read final counter
     valueSize = sizeof(uint64_t);
     CHECK_CUPTI(cuptiEventGroupReadEvent(eventGroup, CUPTI_EVENT_READ_FLAG_NONE,
                                          eventId, &valueSize, &eventVal));
