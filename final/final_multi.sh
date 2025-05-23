@@ -21,8 +21,8 @@ for freq in "${FREQS[@]}"; do
     done
 done
 
-# mkdir 2gpuplots
-# python3 plot.py ./2gpu  ./2gpuplots
+mkdir plots
+python3 plot.py ./final_m  ./plots
 
 
 
