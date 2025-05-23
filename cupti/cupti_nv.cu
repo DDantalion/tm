@@ -50,6 +50,7 @@ int main() {
     CHECK_CUDA_DRV(cuInit(0));
     CHECK_CUDA_DRV(cuDeviceGet(&device, deviceNum));
     CHECK_CUDA_DRV(cuCtxCreate(&context, 0, device));
+    CHECK_CUDA_DRV(cuCtxSetCurrent(context)); 
 
     CUpti_EventGroup eventGroup;
     CUpti_EventID eventId;

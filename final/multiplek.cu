@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         //if (!strcmp(argv[i], "--count" ) && i + 1 < argc) count     = atol(argv[++i]);
         if (!strcmp(argv[i], "--number" ) && i + 1 < argc) number     = atol(argv[++i]);
     }
-    size_t SIZE     = 4 * (number) * size * freq;  //  200 - 1400 MiB
+    size_t SIZE     = 4 * (number) * size * freq;  //  400 - 3200 MiB
     // Select the GPU that owns the allocation (local)
     CHECK(cudaSetDevice(local_gpu));
     char     *buf;
