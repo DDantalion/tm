@@ -26,6 +26,6 @@ done
 
 
 
-# cd ..
-# tar -czvf migration.tar.gz ./round
-# echo "All experiments done."
+cd ..
+tar -czvf finalmulti.tar.gz ./final
+echo "All experiments done."
