@@ -22,9 +22,9 @@ __global__ void migrate_kernel(char *buf, size_t size,
     uint64_t start = clock64();
 
     for (size_t j = 0; j < 1; ++j) {
-        for (size_t i = ini; i < (ini+size); i += 1048576/sizeof(char)) {
-            buf[i] += 1;
-            if (buf[i] > 100) buf[i] -= 5;
+        for (size_t i = ini; i < (ini+size/sizeof(char)); i++) {
+            buf[i*1048576/sizeof(char)] += 1;
+            if (buf[i*1048576/sizeof(char)] > 100) buf[i*1048576/sizeof(char)] -= 5;
         }
     }
 
@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         //if (!strcmp(argv[i], "--count" ) && i + 1 < argc) count     = atol(argv[++i]);
         if (!strcmp(argv[i], "--number" ) && i + 1 < argc) number     = atol(argv[++i]);
     }
-    size_t SIZE     = (number) * 1048576 * freq;  //  100 - 700 MiB
+    size_t SIZE     = 2 * (number) * 1048576 * freq;  //  200 - 1400 MiB
     // Select the GPU that owns the allocation (local)
     CHECK(cudaSetDevice(local_gpu));
     char     *buf;
