@@ -22,7 +22,7 @@ for freq in "${FREQS[@]}"; do
 done
 
 mkdir plots
-python3 plot.py ./final_m  ./plots
+python3 batchplot.py ./final_m  ./plots
 
 
 
