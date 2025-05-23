@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Compile both programs
-nvcc -o prog_a testmigration.cu -lpthread
+nvcc -o prog_a test_migration.cu -lpthread
 #!/bin/bash
 
 FREQS=(200)
