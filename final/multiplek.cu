@@ -35,7 +35,7 @@ __global__ void migrate_kernel(char *buf, size_t size,
 //--------------------------------------------------------------------------
 //  Launch helper – returns the kernel-measured cycles
 //--------------------------------------------------------------------------
-static void migrate(char* buf, uint64_t cycles, size_t size, size_t number, size_t order)
+static void migrate(char* buf, uint64_t* cycles, size_t size, size_t number, size_t order)
 {
     // Switch to the GPU that will execute the kernel (remote)
     for(int i =1; i< number; i++){
