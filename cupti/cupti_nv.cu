@@ -55,7 +55,7 @@ int main() {
     CUpti_EventID eventId;
     uint64_t eventVal = 0;
 
-    uint32_t numDomains;
+    size_t numDomains;
     CHECK_CUPTI(cuptiDeviceGetNumEventDomains(device, &numDomains));
 
     std::vector<CUpti_EventDomainID> domains(numDomains);
@@ -63,7 +63,7 @@ int main() {
 
     bool found = false;
     for (auto domain : domains) {
-        uint32_t numEvents;
+        size_t numEvents;
         CHECK_CUPTI(cuptiEventDomainGetNumEvents(domain, &numEvents));
         std::vector<CUpti_EventID> events(numEvents);
         CHECK_CUPTI(cuptiEventDomainEnumEvents(domain, &numEvents, events.data()));
