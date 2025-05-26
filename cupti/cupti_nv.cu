@@ -76,7 +76,7 @@ int main() {
             char name[128];
             size_t len = sizeof(name);
             CHECK_CUPTI(cuptiEventGetAttribute(ev, CUPTI_EVENT_ATTR_NAME, &len, name));
-            std::cout << "CUPTI event name" << name << endl;
+            std::cout << "CUPTI event name" << name << std::endl;
             if (std::string(name) == "nvlink_total_data_received") {
                 eventId = ev;
                 found = true;
