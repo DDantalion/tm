@@ -58,9 +58,9 @@ for (int i = 0; i < freq; ++i) {
 
     CHECK(cudaSetDevice(dev_dst));
     char *dst_buf;
-    CHECK(cudaMalloc(&dst_buf, size))
+    CHECK(cudaMalloc(&dst_buf, size));
         unsigned int aux;
-        uint64_t start = __rdtscp(&aux);;
+        uint64_t start = __rdtscp(&aux);
         CHECK(cudaMemcpyPeer(dst_buf, dev_dst, src_buf, dev_src, size));
         CHECK(cudaDeviceSynchronize());
         uint64_t end = __rdtscp(&aux);
