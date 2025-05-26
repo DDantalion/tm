@@ -65,7 +65,7 @@ int main() {
 
         CUpti_EventID ev;
         char name[128];
-        strcpy(name, "nvlink_total_data_received");
+        strcpy(name, "NVLINK_TOTAL_DATA_RECEIVED");
     CHECK_CUPTI(cuptiEventGetIdFromName(device, name, &ev));
     eventId = ev;
     CHECK_CUPTI(cuptiEventGroupCreate(context, &eventGroup, 0));
