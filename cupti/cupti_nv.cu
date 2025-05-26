@@ -56,24 +56,23 @@ int main() {
     CUpti_EventID eventId;
     uint64_t eventVal = 0;
 
-uint32_t numDomains32;
-CHECK_CUPTI(cuptiDeviceGetNumEventDomains(device, &numDomains32));
+    uint32_t numDomains32;
+    CHECK_CUPTI(cuptiDeviceGetNumEventDomains(device, &numDomains32));
 
-std::vector<CUpti_EventDomainID> domains(numDomains32);
-size_t sizeInBytes = numDomains32 * sizeof(CUpti_EventDomainID);
-CHECK_CUPTI(cuptiDeviceEnumEventDomains(device, &sizeInBytes, domains.data()));
-size_t numDomains = sizeInBytes / sizeof(CUpti_EventDomainID);
+    size_t domainBufferSize = numDomains32 * sizeof(CUpti_EventDomainID);
+    std::vector<CUpti_EventDomainID> domains(numDomains32);
+    CHECK_CUPTI(cuptiDeviceEnumEventDomains(device, &domainBufferSize, domains.data()));
 
     bool found = false;
-    for (auto domain : domains) {
+    for (CUpti_EventDomainID domain : domains) {
         uint32_t numEvents32;
         CHECK_CUPTI(cuptiEventDomainGetNumEvents(domain, &numEvents32));
 
-        size_t numEvents = static_cast<size_t>(numEvents32);
-        std::vector<CUpti_EventID> events(numEvents);
-        CHECK_CUPTI(cuptiEventDomainEnumEvents(domain, &numEvents, events.data()));
+        size_t eventBufferSize = numEvents32 * sizeof(CUpti_EventID);
+        std::vector<CUpti_EventID> events(numEvents32);
+        CHECK_CUPTI(cuptiEventDomainEnumEvents(domain, &eventBufferSize, events.data()));
 
-        for (auto ev : events) {
+        for (CUpti_EventID ev : events) {
             char name[128];
             size_t len = sizeof(name);
             CHECK_CUPTI(cuptiEventGetAttribute(ev, CUPTI_EVENT_ATTR_NAME, &len, name));
@@ -102,7 +101,6 @@ size_t numDomains = sizeInBytes / sizeof(CUpti_EventDomainID);
 
     auto startTime = std::chrono::high_resolution_clock::now();
 
-    // Run dummy workload
     char *buf;
     size_t size = 64 * 1024 * 1024; // 64 MB
     CHECK_CUDA_RT(cudaMalloc(&buf, size));
