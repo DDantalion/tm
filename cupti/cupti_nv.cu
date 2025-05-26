@@ -63,33 +63,11 @@ int main() {
     std::vector<CUpti_EventDomainID> domains(numDomains32);
     CHECK_CUPTI(cuptiDeviceEnumEventDomains(device, &domainBufferSize, domains.data()));
 
-    bool found = false;
-    for (CUpti_EventDomainID domain : domains) {
-        uint32_t numEvents32;
-        CHECK_CUPTI(cuptiEventDomainGetNumEvents(domain, &numEvents32));
-
-        size_t eventBufferSize = numEvents32 * sizeof(CUpti_EventID);
-        std::vector<CUpti_EventID> events(numEvents32);
-        CHECK_CUPTI(cuptiEventDomainEnumEvents(domain, &eventBufferSize, events.data()));
-
-        for (CUpti_EventID ev : events) {
-            char name[128];
-            size_t len = sizeof(name);
-            CHECK_CUPTI(cuptiEventGetAttribute(ev, CUPTI_EVENT_ATTR_NAME, &len, name));
-            if (std::string(name) == "nvlink_total_data_received") {
-                eventId = ev;
-                found = true;
-                break;
-            }
-        }
-        if (found) break;
-    }
-
-    if (!found) {
-        std::cerr << "CUPTI event 'nvlink_total_data_received' not found.\n";
-        return -1;
-    }
-
+        CUpti_EventID ev;
+        char name[128];
+        name = "nvlink_total_data_received";
+    CHECK_CUPTI(cuptiEventGetIdFromName(device, name, ev));
+    eventId = ev;
     CHECK_CUPTI(cuptiEventGroupCreate(context, &eventGroup, 0));
     CHECK_CUPTI(cuptiEventGroupAddEvent(eventGroup, eventId));
     CHECK_CUPTI(cuptiEventGroupEnable(eventGroup));

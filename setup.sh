@@ -72,7 +72,7 @@ chmod +x p2pb.sh
 #scp -P 42144 -r root@connect.bjc1.seetacloud.com:/root/tm ./Desktop/ncontention/bleed/A100/
 #scp -r ubuntu@64.181.223.194:/home/ubuntu/tmr/tm/bleed.tar.gz ./Desktop/ncontention/bleed/A100II/runr.tar.gz
 #scp -r ubuntu@170.9.245.205:/home/ubuntu/tms/tm/migration.tar.gz .tar.gz ./Desktop/finalc/A100/
-scp -r ubuntu@170.9.245.205:/home/ubuntu/tm/p2pb.tar.gz ./Desktop/finalc/A100/
+scp -r ubuntu@104.171.202.228:/home/ubuntu/tm/p2pb.tar.gz ./Desktop/finalc/V100/
 
 #scp -r ubuntu@104.171.203.90:/home/ubuntu/tm/finalmulti.tar.gz ./Desktop/finalc/V100/
 #scp -r ubuntu@64.181.214.142:/home/ubuntu/tml/tm/schedulec.tar.gz ./Desktop/ncontention/bleed/A100IV/schedulecl.tar.gz
