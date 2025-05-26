@@ -1,7 +1,7 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cupti.h>
-
+#include <cstring>
 #include <iostream>
 #include <vector>
 #include <chrono>
@@ -65,8 +65,8 @@ int main() {
 
         CUpti_EventID ev;
         char name[128];
-        name = "nvlink_total_data_received";
-    CHECK_CUPTI(cuptiEventGetIdFromName(device, name, ev));
+        strcpy(name, "nvlink_total_data_received");
+    CHECK_CUPTI(cuptiEventGetIdFromName(device, name, &ev));
     eventId = ev;
     CHECK_CUPTI(cuptiEventGroupCreate(context, &eventGroup, 0));
     CHECK_CUPTI(cuptiEventGroupAddEvent(eventGroup, eventId));
