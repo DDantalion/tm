@@ -2,6 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <cstring>
+#include <x86intrin.h>
 
 #define CHECK(call)                                                         \
     do {                                                                    \
@@ -64,8 +65,7 @@ for (int i = 0; i < freq; ++i) {
         CHECK(cudaMemcpyPeer(dst_buf, dev_dst, src_buf, dev_src, size));
         CHECK(cudaDeviceSynchronize());
         uint64_t end = __rdtscp(&aux);
-        std::cout << "Cycle: " << (end - start) << std::endl;
-        std::cout << "GPU" << j << "Cycle: " << cycles[i] << '\t';
+        std::cout << "GPU" << j << "Cycle: " << (end - start) << '\t';
         float gbps = compute_bandwidth(size, (end - start));
         std::cout << "Estimated bandwidth: " << gbps << " GB/s" << std::endl;
     // Cleanup
