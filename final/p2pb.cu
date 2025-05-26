@@ -43,15 +43,15 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--dst") && i + 1 < argc) dev_dst = atoi(argv[++i]);
         if (!strcmp(argv[i], "--number") && i + 1 < argc) number = atoi(argv[++i]);
     }
-for (int i = 0; i < freq; ++i) {
-    for (int j =1; j < number; j++){
-    dev_dst = j;
-    // Enable peer access
+        // Enable peer access
     CHECK(cudaSetDevice(dev_src));
     CHECK(cudaDeviceEnablePeerAccess(dev_dst, 0));
 
     CHECK(cudaSetDevice(dev_dst));
     CHECK(cudaDeviceEnablePeerAccess(dev_src, 0));
+for (int i = 0; i < freq; ++i) {
+    for (int j =1; j < number; j++){
+    dev_dst = j;
     // Allocate buffers
     CHECK(cudaSetDevice(dev_src));
     char *src_buf;
