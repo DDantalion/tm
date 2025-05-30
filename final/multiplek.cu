@@ -54,6 +54,14 @@ static void migrate(char* buf, uint64_t* cycles, size_t size, size_t number, siz
 {
     // Switch to the GPU that will execute the kernel (remote)
     for(int i =1; i< number; i++){
+    //     int canAccess = 0;
+    // cudaSetDevice(i);                        // switch to GPU 1
+    // cudaDeviceCanAccessPeer(&canAccess, i, 0);
+    // if (canAccess) {
+    //   cudaDeviceEnablePeerAccess(0, 0);      // allow GPU 1 → GPU 0 access
+    // } else {
+    //   // fall-back: will route through host (slower)
+    // }
     CHECK(cudaSetDevice(i));
     migrate_kernel<<<1, 1>>>(buf, size, &cycles[i-1], (2*size*(order*(number-1) - 1 + i))/sizeof(char));
     }

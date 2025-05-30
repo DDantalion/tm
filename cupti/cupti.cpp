@@ -101,7 +101,10 @@ int main() {
             uint64_t durationNs = 1000;
             CUpti_MetricValue metricValue = {0};
             size_t valuesSizeBytes = eventValues.size() * sizeof(uint64_t);
-
+            std::cout<<"event size byte is "<< eventsSizeBytes << std::endl;
+            std::cout<<"value size byte is "<< valuesSizeBytes << std::endl;
+            std::cout<<"event id "<< *eventIds.data()<< std::endl;
+            std::cout<<"event data is "<< *eventValues.data()<< std::endl;
             CHECK_CUPTI(cuptiMetricGetValue(
                 device,
                 metricId,

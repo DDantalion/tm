@@ -87,10 +87,10 @@ static uint64_t migrate(size_t size,
     uint64_t *cycles;      // unified memory so both host and either GPU can read
 
     CHECK(cudaMallocManaged(&buf,    size));
-    CHECK(cudaMallocManaged(&cycles, sizeof(uint64_t)));
+    CHECK(cudaMalloc(&cycles, sizeof(uint64_t)));
 
     // Switch to the GPU that will execute the kernel (remote)
-    CHECK(cudaSetDevice(remote_gpu));
+    //CHECK(cudaSetDevice(remote_gpu));
     switch (mode){
         case 0: 
         kernel0<<<1, 1>>>(buf, size, count, cycles);
@@ -107,7 +107,14 @@ static uint64_t migrate(size_t size,
     }
     CHECK(cudaDeviceSynchronize());
 
-    uint64_t result = *cycles;
+    //uint64_t result = *cycles;
+    uint64_t result;
+    // copy from device to host
+    CHECK(cudaMemcpy(&result,
+                 cycles,
+                 sizeof(uint64_t),
+                 cudaMemcpyDeviceToHost));
+// now `result` holds the kernel’s elapsed_cycles
 
     CHECK(cudaFree(cycles));
     CHECK(cudaFree(buf));
